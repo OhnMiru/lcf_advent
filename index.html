@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Адвент-календарь: спойлеры</title>
+<title>Адвент-календарь</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marck+Script&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
@@ -97,7 +97,6 @@ button:focus-visible{outline:3px solid var(--berry); outline-offset:2px}
   border:2px dashed var(--line); color:var(--muted); font-size:15px;
 }
 
-/* окно подтверждения */
 dialog{
   text-align:center;
   border:0; border-radius:var(--radius); padding:28px 24px; max-width:420px; width:calc(100% - 32px);
@@ -127,7 +126,6 @@ dialog p{margin:0 0 22px; color:var(--muted)}
     <button class="tab" role="tab" id="tab-items" aria-selected="false" aria-controls="panel-items">Сам мерч</button>
   </div>
 
-  <!-- Вкладка 1: виды мерча -->
   <section id="panel-types" role="tabpanel" aria-labelledby="tab-types">
     <div class="gate" id="types-gate">
       <h2>Спойлер видов мерча</h2>
@@ -140,7 +138,6 @@ dialog p{margin:0 0 22px; color:var(--muted)}
     </div>
   </section>
 
-  <!-- Вкладка 2: сам мерч -->
   <section id="panel-items" role="tabpanel" aria-labelledby="tab-items" class="hidden">
     <div class="gate" id="items-gate">
       <h2>Спойлер самого мерча</h2>
@@ -171,16 +168,7 @@ dialog p{margin:0 0 22px; color:var(--muted)}
 </dialog>
 
 <script>
-/* =====================================================
-   СПИСОК МЕРЧА
-   type  — вид мерча (по нему считается вкладка «Виды мерча» и группировка)
-   name  — полное название позиции, как оно показывается в списке
-   image — путь к картинке БЕЗ расширения, например "images/01": сайт сам найдёт
-           01.webp, 01.jpg, 01.jpeg или 01.png. Можно указать и с расширением.
-           "" — если картинки нет
-   count — сколько штук этого вида (по умолчанию 1); noPic: true — без картинки и без заглушки; last: true — всегда в конце списка
-   Порядок при показе не зависит от порядка здесь: список выводится по алфавиту.
-   ===================================================== */
+
 const ITEMS = [
   { type: "Шейкер", name: "Шейкер: Он, Раон, Хон", image: "images/01" },
   { type: "Своп-карта", name: "Фигурная своп-карта: Бикрос, Рон", image: "images/02" },
@@ -216,7 +204,6 @@ const ITEMS = [
   { type: "Текстовая зарисовка", count: 32, noPic: true, last: true, name: "Текстовые зарисовки × 32: к каждой позиции мерча и коробке" },
 ];
 
-/* Тексты трёх подтверждений — можно менять */
 const STEPS = [
   { title: "Точно хотите увидеть мерч?",
     text: "Вы увидите полное наполнение адвента. Вернуть незнание обратно не получится.",
@@ -231,7 +218,6 @@ const STEPS = [
 
 const $ = id => document.getElementById(id);
 
-/* ---------- вкладки ---------- */
 function showTab(name){
   for (const t of ["types","items"]){
     $("tab-"+t).setAttribute("aria-selected", t===name);
@@ -241,7 +227,6 @@ function showTab(name){
 $("tab-types").onclick = () => showTab("types");
 $("tab-items").onclick = () => showTab("items");
 
-/* ---------- виды мерча ---------- */
 function buildTypes(){
   const counts = {};
   ITEMS.forEach(i => counts[i.type] = (counts[i.type]||0) + (i.count||1));
@@ -259,7 +244,6 @@ $("types-close").onclick = () => {
   $("types-gate").classList.remove("hidden");
 };
 
-/* ---------- мерч: тройное подтверждение ---------- */
 const dlg = $("confirm");
 let step = 0;
 
@@ -278,7 +262,6 @@ $("c-yes").onclick = () => {
   else { dlg.close(); revealItems(); }
 };
 
-/* ---------- показ мерча ---------- */
 let withPics = false;
 
 function esc(s){
@@ -288,7 +271,6 @@ function esc(s){
 const EXTS = [".webp", ".jpg", ".jpeg", ".png"];
 const hasExt = p => /\.(webp|jpe?g|png|gif|avif)$/i.test(p);
 const firstSrc = base => hasExt(base) ? base : base + EXTS[0];
-/* если картинка не нашлась — пробуем следующее расширение, в конце показываем заглушку */
 function imgFail(img){
   const base = img.dataset.base;
   const n = +img.dataset.n + 1;
@@ -301,7 +283,6 @@ function imgFail(img){
 }
 
 function renderItems(){
-  /* по алфавиту, но позиции с last: true всегда в самом конце */
   const sorted = [...ITEMS].sort((a,b) => (a.last?1:0) - (b.last?1:0) || a.name.localeCompare(b.name, "ru"));
   $("items-list").innerHTML = sorted.map(i => {
     let pic = "";
@@ -332,7 +313,7 @@ function revealItems(){
   $("items-result").classList.remove("hidden");
 }
 $("items-close").onclick = () => {
-  $("items-list").innerHTML = "";   /* картинки и названия удаляются со страницы */
+  $("items-list").innerHTML = "";
   $("items-result").classList.add("hidden");
   $("items-gate").classList.remove("hidden");
 };
