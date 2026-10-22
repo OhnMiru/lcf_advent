@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Адвент-календарь: спойлеры</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marck+Script&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e3f1fb; --card:#ffffff; --ink:#0e2a4c; --muted:#546f8c; --line:#b9d6ec;
+  --spruce:#175a9e; --berry:#1f6fcf; --berry-ink:#ffffff;
+  --glow:#f6fbff;
+  --radius:16px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a1a33; --card:#102847; --ink:#e4f2ff; --muted:#94b3d1; --line:#244a74;
+    --spruce:#8ccaff; --berry:#7cc0ff; --berry-ink:#04152b;
+    --glow:#14335c;
+  }
+}
+*{box-sizing:border-box}
+html{height:100%}
+body{
+  margin:0; min-height:100%;
+  background:var(--bg) linear-gradient(180deg,var(--glow) 0,var(--bg) 380px) no-repeat; color:var(--ink);
+  font:400 17px/1.55 "Onest",system-ui,sans-serif;
+  padding:env(safe-area-inset-top,0px) 16px env(safe-area-inset-bottom,0px);
+}
+main{max-width:760px; margin:0 auto; padding:40px 0 64px; text-align:center}
+h1{font:400 clamp(40px,9vw,68px)/1.05 "Marck Script","Brush Script MT",cursive; margin:0 0 12px; color:var(--spruce)}
+h1::after{content:"❄ ❅ ❆"; display:block; font:400 18px/1.4 "Onest",sans-serif; letter-spacing:.6em; color:var(--berry); opacity:.7; margin-top:6px}
+h2{font:400 30px/1.15 "Marck Script","Brush Script MT",cursive; margin:0 0 8px; color:var(--spruce)}
+.lead{color:var(--muted); margin:0 auto 28px; max-width:56ch}
+
+.tabs{display:flex; justify-content:center; gap:6px; border-bottom:2px solid var(--line); margin-bottom:24px}
+.tab{
+  font:600 16px "Onest",sans-serif; color:var(--muted);
+  background:none; border:0; padding:12px 16px; cursor:pointer;
+  border-bottom:3px solid transparent; margin-bottom:-2px;
+}
+.tab[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--berry)}
+.tab:hover{color:var(--ink)}
+button:focus-visible{outline:3px solid var(--berry); outline-offset:2px}
+
+.gate{
+  box-shadow:0 8px 28px rgba(31,111,207,.12);
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  padding:28px 24px;
+}
+.gate p{margin:0 0 18px; color:var(--muted)}
+.btn{
+  font:600 16px "Onest",sans-serif; cursor:pointer;
+  border-radius:10px; padding:12px 20px; border:2px solid var(--berry);
+  background:var(--berry); color:var(--berry-ink);
+}
+.btn.ghost{background:transparent; color:var(--ink); border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--ink)}
+.row{display:flex; flex-wrap:wrap; justify-content:center; gap:10px}
+
+.hidden{display:none !important}
+.types li,.item{box-shadow:0 2px 10px rgba(31,111,207,.08)}
+
+.types{list-style:none; margin:0; padding:0; display:grid; gap:10px}
+.types li{
+  display:flex; justify-content:center; align-items:baseline; gap:12px;
+  background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 18px;
+}
+.count{
+  font-weight:600; color:var(--spruce); white-space:nowrap;
+}
+
+.toolbar{display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:center; margin-bottom:18px}
+.seg{display:inline-flex; border:2px solid var(--line); border-radius:10px; overflow:hidden}
+.seg button{
+  font:600 15px "Onest",sans-serif; padding:9px 16px; border:0; cursor:pointer;
+  background:transparent; color:var(--muted);
+}
+.seg button[aria-pressed="true"]{background:var(--spruce); color:var(--card)}
+
+.items{list-style:none; margin:0; padding:0; display:grid; gap:10px}
+.item{
+  background:var(--card); border:1px solid var(--line); border-radius:10px;
+  padding:14px 18px;
+}
+.name{font-weight:600}
+.kind{color:var(--muted); font-size:15px}
+.pic{margin-top:10px}
+.pic img{
+  display:block; width:100%; max-height:420px; object-fit:contain;
+  background:var(--bg); border-radius:8px;
+}
+.nopic{
+  display:grid; place-items:center; height:140px; border-radius:8px;
+  border:2px dashed var(--line); color:var(--muted); font-size:15px;
+}
+
+/* окно подтверждения */
+dialog{
+  text-align:center;
+  border:0; border-radius:var(--radius); padding:28px 24px; max-width:420px; width:calc(100% - 32px);
+  background:var(--card); color:var(--ink);
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
+dialog::backdrop{background:rgba(10,20,30,.7)}
+dialog h2{margin-bottom:10px}
+dialog p{margin:0 0 22px; color:var(--muted)}
+.dots{display:flex; justify-content:center; gap:6px; margin-bottom:16px}
+.dots i{width:28px; height:5px; border-radius:3px; background:var(--line)}
+.dots i.on{background:var(--berry)}
+.footer{margin-top:36px; color:var(--muted); font-size:14px}
+@media (prefers-reduced-motion:no-preference){
+  dialog[open]{animation:pop .18s ease-out}
+  @keyframes pop{from{transform:scale(.96); opacity:0}to{transform:none; opacity:1}}
+}
+</style>
+</head>
+<body>
+<main>
+  <h1>Что внутри адвента?</h1>
+  <p class="lead">Здесь можно заранее узнать наполнение календаря. Выбирайте, сколько спойлеров вам нужно, — ничего не покажется, пока вы сами не нажмёте кнопку.</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-types" aria-selected="true" aria-controls="panel-types">Виды мерча</button>
+    <button class="tab" role="tab" id="tab-items" aria-selected="false" aria-controls="panel-items">Сам мерч</button>
+  </div>
+
+  <!-- Вкладка 1: виды мерча -->
+  <section id="panel-types" role="tabpanel" aria-labelledby="tab-types">
+    <div class="gate" id="types-gate">
+      <h2>Спойлер видов мерча</h2>
+      <p>Только категории и их количество: например, «стикеры — 3». Без названий и картинок.</p>
+      <button class="btn" id="types-open">Показать виды мерча</button>
+    </div>
+    <div id="types-result" class="hidden">
+      <ul class="types" id="types-list"></ul>
+      <p class="footer"><button class="btn ghost" id="types-close">Спрятать обратно</button></p>
+    </div>
+  </section>
+
+  <!-- Вкладка 2: сам мерч -->
+  <section id="panel-items" role="tabpanel" aria-labelledby="tab-items" class="hidden">
+    <div class="gate" id="items-gate">
+      <h2>Спойлер самого мерча</h2>
+      <p>Здесь полный список наполнения, при желании — с картинками. Если хотите сохранить сюрприз, лучше сюда не заходить.</p>
+      <button class="btn" id="items-open">Хочу увидеть мерч</button>
+    </div>
+    <div id="items-result" class="hidden">
+      <div class="toolbar">
+        <div class="seg" role="group" aria-label="Режим показа">
+          <button id="mode-list" aria-pressed="true">Список</button>
+          <button id="mode-pics" aria-pressed="false">Список с картинками</button>
+        </div>
+        <button class="btn ghost" id="items-close">Спрятать обратно</button>
+      </div>
+      <ul class="items" id="items-list"></ul>
+    </div>
+  </section>
+</main>
+
+<dialog id="confirm">
+  <div class="dots" id="dots"></div>
+  <h2 id="c-title"></h2>
+  <p id="c-text"></p>
+  <div class="row">
+    <button class="btn ghost" id="c-no"></button>
+    <button class="btn" id="c-yes"></button>
+  </div>
+</dialog>
+
+<script>
+/* =====================================================
+   СПИСОК МЕРЧА
+   type  — вид мерча (по нему считается вкладка «Виды мерча» и группировка)
+   name  — полное название позиции, как оно показывается в списке
+   image — путь к картинке БЕЗ расширения, например "images/01": сайт сам найдёт
+           01.webp, 01.jpg, 01.jpeg или 01.png. Можно указать и с расширением.
+           "" — если картинки нет
+   count — сколько штук этого вида (по умолчанию 1); noPic: true — без картинки и без заглушки; last: true — всегда в конце списка
+   Порядок при показе не зависит от порядка здесь: список выводится по алфавиту.
+   ===================================================== */
+const ITEMS = [
+  { type: "Шейкер", name: "Шейкер: Он, Раон, Хон", image: "images/01" },
+  { type: "Своп-карта", name: "Фигурная своп-карта: Бикрос, Рон", image: "images/02" },
+  { type: "Наклейка на карту", name: "Наклейка на карту: Чхве Хан", image: "images/03" },
+  { type: "Календарь", name: "Карманный календарь: Эрхабен", image: "images/04" },
+  { type: "Лента", name: "Лента: древние силы", image: "images/05" },
+  { type: "Своп-карта", name: "Своп-карта на пэт-пластике: Витира, Розалин", image: "images/06" },
+  { type: "Значок", name: "Значок-открывашка: Белая звезда", image: "images/07" },
+  { type: "Стикерпак", name: "Стикерпак А6: Витира, Кейдж, Мэри, Розалин, Хана", image: "images/08" },
+  { type: "Стикерпак", name: "Стикерпак А6: Альбер, Бёрд, Кейл, Пасетон, Хан", image: "images/09" },
+  { type: "Значок", name: "Значок-котик: Он", image: "images/10" },
+  { type: "Значок", name: "Значок-котик: Хон", image: "images/11" },
+  { type: "Брелок", name: "Брелок 4 см: Альбер", image: "images/12" },
+  { type: "Брелок", name: "Брелок 4 см: Кейл", image: "images/13" },
+  { type: "Значок", name: "Значок-сердце: Джур, ориг!Кейл", image: "images/14" },
+  { type: "Гирлянда", name: "Гирлянда: Ким Роксу, Кейл, святой!Кейл", image: "images/15" },
+  { type: "Зеркало", name: "Зеркало: Шеритт", image: "images/16" },
+  { type: "Стикерпак", name: "Стикерпак 3Д: Кейл, Он, Раон, Хон", image: "images/17" },
+  { type: "Картхолдер", name: "Картхолдер: Ким Роксу, Ли Сухек, Чхве Чжонсу", image: "images/18" },
+  { type: "Блок отрывных листов", name: "Блок отрывных листов: Арчи, Витира, Пасетон", image: "images/19" },
+  { type: "Стикерпак", name: "Стикеры 5 см: Альбер и Таша, Бикрос и Рон, Кейл и Джур", image: "images/20" },
+  { type: "Брелок", name: "Плюшевый брелок: Кейл", image: "images/21" },
+  { type: "Значок", name: "Фетровый значок: Эрхабен", image: "images/22" },
+  { type: "Блокнот", name: "Блокнот А7: Лок, Он, Раон, Хон", image: "images/23" },
+  { type: "Значок", name: "Антистресс-значок: Ким Роксу", image: "images/24" },
+  { type: "Значок", name: "Значок-квадрат: Чхве Хан", image: "images/25" },
+  { type: "Своп-карта", name: "Фигурная своп-карта: Мэри", image: "images/26" },
+  { type: "Магнит", name: "Квадратный магнит: Фредо", image: "images/27" },
+  { type: "Карточка", name: "Карточка-переливашка: Кейл, Он, Раон, Хон", image: "images/28" },
+  { type: "Значок", name: "Значок-крышка: Бёрд", image: "images/29" },
+  { type: "Пин", name: "Акриловый пин: Бог Смерти", image: "images/30" },
+  { type: "Своп-карта", name: "Резная своп-карта: Кейдж, Тейлор", image: "images/31" },
+  { type: "Текстовая зарисовка", count: 32, noPic: true, last: true, name: "Текстовые зарисовки × 32: к каждой позиции мерча и коробке" },
+];
+
+/* Тексты трёх подтверждений — можно менять */
+const STEPS = [
+  { title: "Точно хотите увидеть мерч?",
+    text: "Вы увидите полное наполнение адвента. Вернуть незнание обратно не получится.",
+    no: "Нет, назад", yes: "Да, продолжить" },
+  { title: "Это спойлер",
+    text: "Весь сюрприз при открытии окошек пропадёт. Может, оставить хотя бы часть тайны?",
+    no: "Передумал(а)", yes: "Всё равно хочу" },
+  { title: "Последний шанс",
+    text: "Дальше пути назад нет. Показать наполнение?",
+    no: "Нет, спрятать", yes: "Да, показать мерч" },
+];
+
+const $ = id => document.getElementById(id);
+
+/* ---------- вкладки ---------- */
+function showTab(name){
+  for (const t of ["types","items"]){
+    $("tab-"+t).setAttribute("aria-selected", t===name);
+    $("panel-"+t).classList.toggle("hidden", t!==name);
+  }
+}
+$("tab-types").onclick = () => showTab("types");
+$("tab-items").onclick = () => showTab("items");
+
+/* ---------- виды мерча ---------- */
+function buildTypes(){
+  const counts = {};
+  ITEMS.forEach(i => counts[i.type] = (counts[i.type]||0) + (i.count||1));
+  $("types-list").innerHTML = Object.entries(counts).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0], "ru")).map(([t,n]) =>
+    `<li><span>${esc(t)}</span><span class="count">× ${n}</span></li>`).join("");
+}
+$("types-open").onclick = () => {
+  buildTypes();
+  $("types-gate").classList.add("hidden");
+  $("types-result").classList.remove("hidden");
+};
+$("types-close").onclick = () => {
+  $("types-list").innerHTML = "";
+  $("types-result").classList.add("hidden");
+  $("types-gate").classList.remove("hidden");
+};
+
+/* ---------- мерч: тройное подтверждение ---------- */
+const dlg = $("confirm");
+let step = 0;
+
+function renderStep(){
+  const s = STEPS[step];
+  $("dots").innerHTML = STEPS.map((_,i) => `<i class="${i<=step?"on":""}"></i>`).join("");
+  $("c-title").textContent = s.title;
+  $("c-text").textContent = s.text;
+  $("c-no").textContent = s.no;
+  $("c-yes").textContent = s.yes;
+}
+$("items-open").onclick = () => { step = 0; renderStep(); dlg.showModal(); $("c-no").focus(); };
+$("c-no").onclick = () => dlg.close();
+$("c-yes").onclick = () => {
+  if (step < STEPS.length - 1){ step++; renderStep(); $("c-no").focus(); }
+  else { dlg.close(); revealItems(); }
+};
+
+/* ---------- показ мерча ---------- */
+let withPics = false;
+
+function esc(s){
+  return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+}
+
+const EXTS = [".webp", ".jpg", ".jpeg", ".png"];
+const hasExt = p => /\.(webp|jpe?g|png|gif|avif)$/i.test(p);
+const firstSrc = base => hasExt(base) ? base : base + EXTS[0];
+/* если картинка не нашлась — пробуем следующее расширение, в конце показываем заглушку */
+function imgFail(img){
+  const base = img.dataset.base;
+  const n = +img.dataset.n + 1;
+  if (!hasExt(base) && n < EXTS.length){
+    img.dataset.n = n;
+    img.src = base + EXTS[n];
+  } else {
+    img.parentNode.innerHTML = '<div class="nopic">Картинка не найдена</div>';
+  }
+}
+
+function renderItems(){
+  /* по алфавиту, но позиции с last: true всегда в самом конце */
+  const sorted = [...ITEMS].sort((a,b) => (a.last?1:0) - (b.last?1:0) || a.name.localeCompare(b.name, "ru"));
+  $("items-list").innerHTML = sorted.map(i => {
+    let pic = "";
+    if (withPics && !i.noPic){
+      pic = i.image
+        ? `<div class="pic"><img src="${esc(firstSrc(i.image))}" data-base="${esc(i.image)}" data-n="0" alt="${esc(i.name)}" loading="lazy" onerror="imgFail(this)"></div>`
+        : `<div class="pic"><div class="nopic">Картинки пока нет</div></div>`;
+    }
+    return `<li class="item">
+      <span class="name">${esc(i.name)}</span>
+      ${pic}
+    </li>`;
+  }).join("");
+}
+
+function setMode(pics){
+  withPics = pics;
+  $("mode-list").setAttribute("aria-pressed", !pics);
+  $("mode-pics").setAttribute("aria-pressed", pics);
+  renderItems();
+}
+$("mode-list").onclick = () => setMode(false);
+$("mode-pics").onclick = () => setMode(true);
+
+function revealItems(){
+  setMode(false);
+  $("items-gate").classList.add("hidden");
+  $("items-result").classList.remove("hidden");
+}
+$("items-close").onclick = () => {
+  $("items-list").innerHTML = "";   /* картинки и названия удаляются со страницы */
+  $("items-result").classList.add("hidden");
+  $("items-gate").classList.remove("hidden");
+};
+</script>
+</body>
+</html>
